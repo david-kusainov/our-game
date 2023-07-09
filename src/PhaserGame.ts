@@ -39,11 +39,16 @@ const upperWorldConfig: Phaser.Types.Core.GameConfig = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			gravity: { y: 0 },
+			gravity: { y: 1000 },
 			debug: true,
 		},
 	},
 	scene: [UpperWorld],
+	plugins: {
+		scene: [
+		  { key: 'InputPlugin', plugin: Phaser.Input.InputPlugin, mapping: 'input' }
+		]
+	  },
 	callbacks: {
         postBoot: (game) => {
             game.canvas.style.width = '100%';
@@ -64,7 +69,7 @@ const afterWorldConfig: Phaser.Types.Core.GameConfig = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			gravity: { y: 0 },
+			gravity: { y: 200 },
 			debug: true,
 		},
 	},
