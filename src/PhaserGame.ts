@@ -1,15 +1,40 @@
+// import Phaser from 'phaser'
+
+// import { UpperWorld, AfterWorld } from './scenes'
+
+// const config: Phaser.Types.Core.GameConfig = {
+// 	type: Phaser.AUTO,
+// 	parent: 'phaser-container',
+// 	backgroundColor: '#282c34',
+// 	scale: {
+// 		mode: Phaser.Scale.ScaleModes.RESIZE,
+// 		width: window.innerWidth/2,
+// 		height: window.innerHeight,
+// 	},
+// 	physics: {
+// 		default: 'arcade',
+// 		arcade: {
+// 			gravity: { y: 0 },
+// 			debug: true,
+// 		},
+// 	},
+// 	scene: [UpperWorld, AfterWorld],
+// }
+// // eslint-disable-next-line import/no-anonymous-default-export
+// export default new Phaser.Game(config)
+
 import Phaser from 'phaser'
+import { UpperWorld } from './scenes'
+import { AfterWorld } from './scenes'
 
-import { Bootstrap } from './scenes'
-
-const config: Phaser.Types.Core.GameConfig = {
+const upperWorldConfig: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
 	parent: 'phaser-container',
 	backgroundColor: '#282c34',
 	scale: {
 		mode: Phaser.Scale.ScaleModes.RESIZE,
 		width: window.innerWidth,
-		height: window.innerHeight,
+		height: window.innerHeight ,
 	},
 	physics: {
 		default: 'arcade',
@@ -18,7 +43,39 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: true,
 		},
 	},
-	scene: [Bootstrap],
+	scene: [UpperWorld],
+	callbacks: {
+        postBoot: (game) => {
+            game.canvas.style.width = '100%';
+            game.canvas.style.height = `${window.innerHeight / 2}px`;
+        },
+    },
 }
-// eslint-disable-next-line import/no-anonymous-default-export
-export default new Phaser.Game(config)
+
+const afterWorldConfig: Phaser.Types.Core.GameConfig = {
+	type: Phaser.AUTO,
+	parent: 'phaser-container',
+	backgroundColor: '#282c34',
+	scale: {
+		mode: Phaser.Scale.ScaleModes.RESIZE,
+		width: window.innerWidth,
+		height: window.innerHeight / 2,
+	},
+	physics: {
+		default: 'arcade',
+		arcade: {
+			gravity: { y: 0 },
+			debug: true,
+		},
+	},
+	scene: [AfterWorld],
+	callbacks: {
+        postBoot: (game) => {
+            game.canvas.style.width = '100%';
+            game.canvas.style.height = `${window.innerHeight / 2}px`;
+        },
+    },
+}
+
+new Phaser.Game(upperWorldConfig)
+new Phaser.Game(afterWorldConfig)
