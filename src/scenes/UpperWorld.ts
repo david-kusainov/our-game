@@ -24,8 +24,8 @@ export class UpperWorld extends Phaser.Scene {
     // Земля
 	const groundGroup = this.physics.add.staticGroup()
     groundGroup.create(300, 900, 'ground')
-	groundGroup.create(820, 900, 'ground')
-	groundGroup.create(1340, 900, 'ground')
+    groundGroup.create(820, 900, 'ground')
+    groundGroup.create(1340, 900, 'ground')
 
 
     // Игрок
@@ -35,15 +35,15 @@ export class UpperWorld extends Phaser.Scene {
     this.physics.add.collider(this.player, groundGroup)
 
     // Контроллер игрока
-	const inputPlugin = this.input
-	if (inputPlugin && inputPlugin.keyboard) {
-	  this.playerController = new PlayerController(this, this.player, inputPlugin)
-	}
+    const inputPlugin = this.input
+    if (inputPlugin && inputPlugin.keyboard) {
+      this.playerController = new PlayerController(this, this.player, inputPlugin)
+    }
   }
 
   update() {
-	if (this.playerController) {
-		this.playerController.update();
-	  }
+    if (this.playerController) {
+      this.playerController.update();
+    }
   }
 }

@@ -15,7 +15,6 @@ export class PlayerController {
   }
 
   update() {
-    // Player movement controls
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-300)
     } else if (this.cursors.right.isDown) {
@@ -24,7 +23,6 @@ export class PlayerController {
       this.player.setVelocityX(0)
     }
 
-    // Player jump control
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body
     if (this.cursors.up.isDown && playerBody.onFloor()) {
       if (!this.isJumping) {
