@@ -1,6 +1,9 @@
 import Phaser from 'phaser'
 
 export class PlayerController {
+  destroy() {
+    throw new Error('Method not implemented.')
+  }
   private player!: Phaser.Physics.Arcade.Sprite
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   private isJumping: boolean = false
