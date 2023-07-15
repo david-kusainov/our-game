@@ -33,6 +33,9 @@
         const directionY = Math.sign(this.player!.y - ghostSprite.y);
         ghostSprite.setVelocityX(directionX * 200);
         ghostSprite.setVelocityY(directionY * 100);
+        this.physics.add.collider(ghostSprite, this.player, () => {
+          // Логика соприкосновения
+        });
       });
 
       // Логика гарпий
@@ -90,6 +93,10 @@
         if (distance < 100) {
           vikingSprite.setVelocityY(-300);
         }
+
+        this.physics.add.collider(vikingSprite, this.player, () => {
+          // Логика соприкосновения
+        });
       });
     }
   }
