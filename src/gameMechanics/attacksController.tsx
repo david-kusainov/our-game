@@ -53,8 +53,6 @@ export class DaggerController {
     }
   }
   
-  
-
   returnDagger() {
     this.dagger?.setVisible(false);
     this.daggerThrown = false;
