@@ -13,7 +13,7 @@ const upperWorldConfig: Phaser.Types.Core.GameConfig = {
 	physics: {
 		default: 'arcade',
 		arcade: {
-			gravity: { y: 1000 },
+			gravity: { y: 0 },
 			debug: true,
 		},
 	},

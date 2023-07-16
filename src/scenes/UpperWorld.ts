@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PlayerController } from '../gameMechanics/movement';
 import { DaggerController } from '../gameMechanics/attacksController';
 import { EnemyLogic } from '../gameMechanics/enemyLogic';
+import { CharacterController } from '../gameMechanics/hitPoint';
 
 export class UpperWorld extends Phaser.Scene {
   private playerController?: PlayerController;
@@ -12,15 +13,16 @@ export class UpperWorld extends Phaser.Scene {
   private harpyGroup?: Phaser.Physics.Arcade.Group;
   private vikingGroup?: Phaser.Physics.Arcade.Group;
   private enemyLogic?: EnemyLogic;
+  private characterController: CharacterController;
+  private healthText?: Phaser.GameObjects.Text;
   
 
   constructor() {
     super('upperworld');
+    this.characterController = new CharacterController(this);
   }
 
-  init() {}
-
-  async preload() {
+  preload() {
     this.load.image('upperworld-sky', './assets/background.png');
     this.load.image('ground', './assets/ground.png');
     this.load.image('man', './assets/man.png');
@@ -31,6 +33,19 @@ export class UpperWorld extends Phaser.Scene {
   }
 
   create() {
+    // Отображение жизней
+    this.healthText = this.add.text(10, 10, '', { font: '20px', color: 'red' });
+    this.healthText.setScrollFactor(0);
+    this.updateHealthText();
+
+
+    // Камера
+    const worldWidth = 5000; // Ширина сцены
+    const worldHeight = 600; // Высота сцены
+    this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
+    this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
+    this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
+
     // Задний фон
     this.add.image(300, 400, 'upperworld-sky');
 
@@ -44,10 +59,11 @@ export class UpperWorld extends Phaser.Scene {
     this.player = this.physics.add.sprite(300, 300, 'man');
     this.player.setScale(0.4);
     this.physics.add.collider(this.player, this.groundGroup);
+    this.cameras.main.startFollow(this.player);
 
     // Призрак
     this.ghostGroup = this.physics.add.group();
-    const ghost1 = this.ghostGroup.create(300, 300, 'ghost');
+    const ghost1 = this.ghostGroup.create(500, 300, 'ghost');
 
     this.ghostGroup.getChildren().forEach((ghost: Phaser.GameObjects.GameObject) => {
       const ghostSprite = ghost as Phaser.Physics.Arcade.Sprite;
@@ -58,7 +74,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Гарпии
     this.harpyGroup = this.physics.add.group();
-    const harpy1 = this.harpyGroup.create(400, 300, 'harpy');
+    // const harpy1 = this.harpyGroup.create(400, 300, 'harpy');
 
     this.harpyGroup.getChildren().forEach((harpy: Phaser.GameObjects.GameObject) => {
       const harpySprite = harpy as Phaser.Physics.Arcade.Sprite;
@@ -69,7 +85,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Викинги
     this.vikingGroup = this.physics.add.group();
-    const viking1 = this.vikingGroup.create(500, 300, 'viking');
+    // const viking1 = this.vikingGroup.create(500, 300, 'viking');
 
     this.vikingGroup.getChildren().forEach((viking: Phaser.GameObjects.GameObject) => {
       const vikingSprite = viking as Phaser.Physics.Arcade.Sprite;
@@ -89,7 +105,7 @@ export class UpperWorld extends Phaser.Scene {
     }
 
     // Контроллер кинжала
-    this.daggerController = new DaggerController(this.player, this);
+    this.daggerController = new DaggerController(this.player, this, this.ghostGroup, this.harpyGroup, this.vikingGroup,);
     this.daggerController.create();
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -100,16 +116,25 @@ export class UpperWorld extends Phaser.Scene {
   }
 
   update() {
+    this.updateHealthText();
+
     if (this.playerController) {
       this.playerController.update();
     }
 
     if (this.daggerController) {
       this.daggerController.update();
+
     }
 
     if (this.enemyLogic) {
       this.enemyLogic.update();
+    }
+  }
+
+ updateHealthText(): void {
+    if (this.healthText) {
+      this.healthText.setText(`Здоровье: ${this.characterController.getHealth()}`);
     }
   }
 }
