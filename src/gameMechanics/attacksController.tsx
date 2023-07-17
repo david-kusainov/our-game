@@ -8,13 +8,15 @@ export class DaggerController {
   private initialPlayerX: number = 0;
   private initialPlayerY: number = 0;
   private hitCounts: Map<Phaser.Physics.Arcade.Sprite, number> = new Map();
+  private bossHitCounts: Map<Phaser.Physics.Arcade.Sprite, number> = new Map();
 
   constructor(
     private player: Phaser.Physics.Arcade.Sprite,
     private scene: Phaser.Scene,
     private ghostGroup: Phaser.Physics.Arcade.Group,
     private harpyGroup: Phaser.Physics.Arcade.Group,
-    private vikingGroup: Phaser.Physics.Arcade.Group
+    private vikingGroup: Phaser.Physics.Arcade.Group,
+    private bossGroup: Phaser.Physics.Arcade.Group
   ) {}
 
   create() {
@@ -116,6 +118,7 @@ export class DaggerController {
       this.checkMonsterCollisions(this.ghostGroup);
       this.checkMonsterCollisions(this.harpyGroup);
       this.checkMonsterCollisions(this.vikingGroup);
+      this.checkMonsterCollisions(this.bossGroup);
     }
   }
 
@@ -126,13 +129,26 @@ export class DaggerController {
         return;
       }
 
-      if (
-        Phaser.Geom.Intersects.RectangleToRectangle(
-          monsterSprite.getBounds(),
-          this.dagger!.getBounds()
-        )
-      ) {
-        this.handleMonsterHit(monsterSprite);
+      if (group === this.bossGroup) {
+        // Это босс
+        if (
+          Phaser.Geom.Intersects.RectangleToRectangle(
+            monsterSprite.getBounds(),
+            this.dagger!.getBounds()
+          )
+        ) {
+          this.handleBossHit(monsterSprite);
+        }
+      } else {
+        // Это обычный монстр
+        if (
+          Phaser.Geom.Intersects.RectangleToRectangle(
+            monsterSprite.getBounds(),
+            this.dagger!.getBounds()
+          )
+        ) {
+          this.handleMonsterHit(monsterSprite);
+        }
       }
     });
   }
@@ -143,8 +159,19 @@ export class DaggerController {
 
     // console.log(`Количество попаданий: ${hitCount}`);
 
-    if (hitCount >= 100) {
+    if (hitCount >= 100) { // Псевдо жизни монстров
       monster.destroy();
+    }
+  }
+
+  handleBossHit(boss: Phaser.Physics.Arcade.Sprite) {
+    const bossHitCount = (this.bossHitCounts.get(boss) || 0) + 1;
+    this.bossHitCounts.set(boss, bossHitCount);
+
+    // console.log(`Количество попаданий: ${bossHitCount}`);
+
+    if (bossHitCount >= 1000) { // Псевдо жизни для босса
+      boss.destroy();
     }
   }
 }

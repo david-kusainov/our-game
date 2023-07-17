@@ -1,15 +1,21 @@
 import Phaser from 'phaser';
 import { CharacterController } from './hitPoint';
 
+import harpyBullet  from '../../public/assets/dagger.png' 
+
 export class EnemyLogic {
   private ghostGroup?: Phaser.Physics.Arcade.Group;
   private harpyGroup?: Phaser.Physics.Arcade.Group;
   private vikingGroup?: Phaser.Physics.Arcade.Group;
+  private bossGroup?: Phaser.Physics.Arcade.Group;
   private player: Phaser.Physics.Arcade.Sprite;
   private time: Phaser.Time.Clock;
   private physics: Phaser.Physics.Arcade.ArcadePhysics;
   private characterController: CharacterController;
-  private visibilityRadius: number = 500;// Расстояние видимости
+  private harpyBulletPath: string;
+  private bossBulletPath: string;
+  private visibilityRadius: number = 800;// Расстояние видимости
+  private visibilityRadiusBoss: number = 1200;// Расстояние видимости для босса
   private lastHitTime: number = 0;
   private hitCooldown: number = 300; //Задержка атак
 
@@ -17,22 +23,30 @@ export class EnemyLogic {
     scene: Phaser.Scene,
     player: Phaser.Physics.Arcade.Sprite,
     groundGroup: Phaser.Physics.Arcade.StaticGroup,
-    physics: Phaser.Physics.Arcade.ArcadePhysics
+    physics: Phaser.Physics.Arcade.ArcadePhysics,
+    harpyBulletPath: string,
+    bossBulletPath: string
   ) {
     this.player = player;
     this.time = scene.time;
     this.physics = physics;
     this.characterController = new CharacterController(scene);
+    this.harpyBulletPath = harpyBulletPath;
+    this.bossBulletPath = bossBulletPath;
   }
+
+
 
   setGroups(
     ghostGroup: Phaser.Physics.Arcade.Group,
     harpyGroup: Phaser.Physics.Arcade.Group,
-    vikingGroup: Phaser.Physics.Arcade.Group
+    vikingGroup: Phaser.Physics.Arcade.Group,
+    bossGroup: Phaser.Physics.Arcade.Group
   ) {
     this.ghostGroup = ghostGroup;
     this.harpyGroup = harpyGroup;
     this.vikingGroup = vikingGroup;
+    this.bossGroup = bossGroup;
   }
 
   update() {
@@ -104,8 +118,9 @@ export class EnemyLogic {
         const canFire = currentTime - lastFireTime >= fireRate;
 
         if (canFire) {
-          const bullet = this.physics.add.sprite(harpySprite.x, harpySprite.y, 'bullet');
-          bullet.setVelocityY(500);
+          const bullet = this.physics.add.sprite(harpySprite.x, harpySprite.y, 'harpyBullet');
+          bullet.setScale(0.3); // Размер
+          bullet.setVelocityY(500); // Скорость
 
           // Логика прокосновений
           this.physics.add.collider(bullet, this.player, () => {
@@ -163,5 +178,70 @@ export class EnemyLogic {
         }
       });
     });
+
+    // Логика босса
+    this.bossGroup?.getChildren().forEach((boss: Phaser.GameObjects.GameObject) => {
+      const bossSprite = boss as Phaser.Physics.Arcade.Sprite;
+      const directionX = Math.sign(this.player!.x - bossSprite.x);
+
+      // Проверяем расстояние до игрока
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.player!.x,
+        this.player!.y,
+        bossSprite.x,
+        bossSprite.y
+      );
+
+      if (distanceToPlayer < this.visibilityRadiusBoss) {
+        bossSprite.setVelocityX(directionX * 200); // Скорость движения по оси X
+
+        const jumpRate = 5000; // Прыжок каждые 5 секунд
+        let lastJumpTime = bossSprite.getData('lastJumpTime') || 0;
+        const currentTime = this.time.now;
+        const canJump = currentTime - lastJumpTime >= jumpRate;
+
+        if (canJump) {
+          bossSprite.setVelocityY(-600); // Прыжок вверх
+          lastJumpTime = currentTime;
+          bossSprite.setData('lastJumpTime', lastJumpTime);
+        }
+
+        // Стрельба
+        const fireRate = 3000;
+        let lastFireTime = bossSprite.getData('lastFireTime') || 0;
+        const canFire = currentTime - lastFireTime >= fireRate;
+
+        if (canFire) {
+          const bullet = this.physics.add.sprite(bossSprite.x, bossSprite.y, 'bossBullet');
+          bullet.setScale(0.3); // Размер
+          bullet.setVelocityX(directionX * 500); // Скорость по оси X
+
+          // Логика прокосновений
+          this.physics.add.collider(bullet, this.player, () => {
+            const currentTime = this.time.now;
+            if (currentTime - this.lastHitTime >= this.hitCooldown) {
+              this.characterController.takeDamage(20);  // Единиц урона за касание
+              this.lastHitTime = currentTime;
+            }
+          });
+
+          lastFireTime = currentTime;
+          bossSprite.setData('lastFireTime', lastFireTime);
+        }
+      } else {
+        bossSprite.setVelocity(0);
+      }
+
+      // Логика прокосновений
+      this.physics.add.collider(bossSprite, this.player, () => {
+        const currentTime = this.time.now;
+        if (currentTime - this.lastHitTime >= this.hitCooldown) {
+          this.characterController.takeDamage(10); // Единиц урона за касание
+          this.lastHitTime = currentTime;
+        }
+      });
+    });
+
+
   }
 }

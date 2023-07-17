@@ -12,9 +12,12 @@ export class UpperWorld extends Phaser.Scene {
   private ghostGroup?: Phaser.Physics.Arcade.Group;
   private harpyGroup?: Phaser.Physics.Arcade.Group;
   private vikingGroup?: Phaser.Physics.Arcade.Group;
+  private bossGroup?: Phaser.Physics.Arcade.Group;
   private enemyLogic?: EnemyLogic;
   private characterController: CharacterController;
   private healthText?: Phaser.GameObjects.Text;
+  private harpyBulletPath!: string;
+  private bossBulletPath!: string;
   
 
   constructor() {
@@ -30,6 +33,11 @@ export class UpperWorld extends Phaser.Scene {
     this.load.image('harpy', './assets/harpy.png');
     this.load.image('viking', './assets/viking.png');
     this.load.image('ghost', './assets/ghost.png');
+    this.load.image('boss', './assets/viking.png'); // Инициализируете босса
+    this.harpyBulletPath = './assets/dagger.png';
+    this.load.image('harpyBullet', this.harpyBulletPath); // Снаряд для гарпии
+    this.bossBulletPath = './assets/dagger.png';
+    this.load.image('bossBullet',  this.bossBulletPath); // Снаряд для босса
   }
 
   create() {
@@ -61,13 +69,23 @@ export class UpperWorld extends Phaser.Scene {
     this.physics.add.collider(this.player, this.groundGroup);
     this.cameras.main.startFollow(this.player);
 
+    // Босс
+    this.bossGroup = this.physics.add.group();
+    //const boss1 = this.bossGroup.create(500, 300, 'boss')
+    this.bossGroup.getChildren().forEach((boss: Phaser.GameObjects.GameObject) => {
+      const bossSprite = boss as Phaser.Physics.Arcade.Sprite;
+      bossSprite.setScale(0.5); // Размеры
+    });
+
+    this.physics.add.collider(this.bossGroup, this.groundGroup);
+
     // Призрак
     this.ghostGroup = this.physics.add.group();
-    const ghost1 = this.ghostGroup.create(500, 300, 'ghost');
+    // const ghost1 = this.ghostGroup.create(500, 300, 'ghost');
 
     this.ghostGroup.getChildren().forEach((ghost: Phaser.GameObjects.GameObject) => {
       const ghostSprite = ghost as Phaser.Physics.Arcade.Sprite;
-      ghostSprite.setScale(0.5);
+      ghostSprite.setScale(0.5);  // Размеры
     });
 
     this.physics.add.collider(this.ghostGroup, this.groundGroup);
@@ -78,7 +96,7 @@ export class UpperWorld extends Phaser.Scene {
 
     this.harpyGroup.getChildren().forEach((harpy: Phaser.GameObjects.GameObject) => {
       const harpySprite = harpy as Phaser.Physics.Arcade.Sprite;
-      harpySprite.setScale(0.5);
+      harpySprite.setScale(0.5);  // Размеры
     });
 
     this.physics.add.collider(this.harpyGroup, this.groundGroup);
@@ -89,14 +107,14 @@ export class UpperWorld extends Phaser.Scene {
 
     this.vikingGroup.getChildren().forEach((viking: Phaser.GameObjects.GameObject) => {
       const vikingSprite = viking as Phaser.Physics.Arcade.Sprite;
-      vikingSprite.setScale(0.2);
+      vikingSprite.setScale(0.2);  // Размеры
     });
   
     this.physics.add.collider(this.vikingGroup, this.groundGroup);
 
     // Инициализация логики врагов
-    this.enemyLogic = new EnemyLogic(this, this.player, this.groundGroup, this.physics);
-    this.enemyLogic.setGroups(this.ghostGroup, this.harpyGroup, this.vikingGroup);
+    this.enemyLogic = new EnemyLogic(this, this.player, this.groundGroup, this.physics, this.harpyBulletPath, this.bossBulletPath);
+    this.enemyLogic.setGroups(this.ghostGroup, this.harpyGroup, this.vikingGroup, this.bossGroup);
 
     // Контроллер персонажа
     const inputPlugin = this.input;
@@ -105,7 +123,7 @@ export class UpperWorld extends Phaser.Scene {
     }
 
     // Контроллер кинжала
-    this.daggerController = new DaggerController(this.player, this, this.ghostGroup, this.harpyGroup, this.vikingGroup,);
+    this.daggerController = new DaggerController(this.player, this, this.ghostGroup, this.harpyGroup, this.vikingGroup, this.bossGroup);
     this.daggerController.create();
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
