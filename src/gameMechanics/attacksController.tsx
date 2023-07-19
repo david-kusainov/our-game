@@ -9,6 +9,7 @@ export class DaggerController {
   private initialPlayerY: number = 0;
   private hitCounts: Map<Phaser.Physics.Arcade.Sprite, number> = new Map();
   private bossHitCounts: Map<Phaser.Physics.Arcade.Sprite, number> = new Map();
+  private HpBoss: any;
 
   constructor(
     private player: Phaser.Physics.Arcade.Sprite,
@@ -168,9 +169,11 @@ export class DaggerController {
     const bossHitCount = (this.bossHitCounts.get(boss) || 0) + 1;
     this.bossHitCounts.set(boss, bossHitCount);
 
+    this.HpBoss = bossHitCount;
+
     // console.log(`Количество попаданий: ${bossHitCount}`);
 
-    if (bossHitCount >= 1000) { // Псевдо жизни для босса
+    if (bossHitCount >= 10) { // Псевдо жизни для босса
       boss.destroy();
     }
   }

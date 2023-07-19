@@ -7,7 +7,7 @@ import { CharacterController } from '../gameMechanics/hitPoint';
 
 let commentText: Phaser.GameObjects.Text;
 const comments = ['Люблю флексить!', 'Смотри как могу!', 'Вот так вот!', 'Как? Да вот так вот!', 'Играй по аккуратнее!', 'Я как Майкл Джексон!', 'Когда то и меня вела дорога приключений, но потом мне прострелили колено', 'Отступаем!', 'Хожу только задом на перед',
-'Че смотришь?', 'Впереди интересно', 'Ну не очень то и хотелось туда', 'У меня меч летает...'];
+'Че смотришь?', 'Впереди интересно', 'Ну не очень то и хотелось туда', 'У меня меч летает...', 'Люблю флексить', 'Я как Майкл Джесон','Ну все базар Джексон'];
 
 export class UpperWorld extends Phaser.Scene {
   private playerController?: PlayerController;
@@ -75,13 +75,16 @@ export class UpperWorld extends Phaser.Scene {
 
     this.bossBulletPath = './assets/dagger-boss.png';
     this.load.image('bossBullet',  this.bossBulletPath); // Снаряд для босса
+
+    this.load.audio('sound', './assets/music.mp3');
   }
 
   create() {
-  
+    let sound = this.sound.add('sound');
+    sound.play();
     // Камера
     const worldWidth = 10400; // Ширина сцены
-    const worldHeight = 1000; // Высота сцены
+    const worldHeight = 600; // Высота сцены
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
     this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
@@ -120,16 +123,16 @@ export class UpperWorld extends Phaser.Scene {
 
     const block6 = this.groundGroup.create(2800, 470, 'block-blue');
 
-    const block7 = this.groundGroup.create(4220, 500, 'block-blue');
-    const block8 = this.groundGroup.create(4370, 400, 'block-blue');
-    const block9 = this.groundGroup.create(4520, 300, 'block-blue');
-    const block10 = this.groundGroup.create(4670, 200, 'block-blue');
+    // const block7 = this.groundGroup.create(4220, 500, 'block-blue');
+    // const block8 = this.groundGroup.create(4370, 400, 'block-blue');
+    // const block9 = this.groundGroup.create(4520, 300, 'block-blue');
+    // const block10 = this.groundGroup.create(4670, 200, 'block-blue');
 
     const block11 = this.groundGroup.create(4750, 0, 'block-kirpich');
     const block12 = this.groundGroup.create(4750, 80, 'block-kirpich');
-    const block13 = this.groundGroup.create(4750, 80, 'block-kirpich');
-    const block14 = this.groundGroup.create(4750, 80, 'block-kirpich');
-    const block15 = this.groundGroup.create(4750, 80, 'block-kirpich');
+    const block13 = this.groundGroup.create(4750, 160, 'block-kirpich');
+    const block14 = this.groundGroup.create(4750, 240, 'block-kirpich');
+    const block15 = this.groundGroup.create(4750, 320, 'block-kirpich');
 
     const block119 = this.groundGroup.create(6750, 480, 'block-kirpich');
 
@@ -139,7 +142,7 @@ export class UpperWorld extends Phaser.Scene {
 
 
     // Персонаж
-    this.player = this.physics.add.sprite(200, 500, 'man');
+    this.player = this.physics.add.sprite(200, 300, 'man');
     this.player.setScale(0.4);
     this.physics.add.collider(this.player, this.groundGroup);
     this.cameras.main.startFollow(this.player);
@@ -156,7 +159,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Босс
     this.bossGroup = this.physics.add.group();
-    //const boss1 = this.bossGroup.create(9000, 300, 'boss')
+    const boss1 = this.bossGroup.create(300, 300, 'boss')
 
     this.anims.create({
       key: 'boss',
@@ -191,6 +194,7 @@ export class UpperWorld extends Phaser.Scene {
       ghostSprite.play('ghost');
     });
 
+    this.physics.add.collider(this.ghostGroup, this.groundGroup);
 
     // Гарпии
     this.harpyGroup = this.physics.add.group();
@@ -255,6 +259,10 @@ export class UpperWorld extends Phaser.Scene {
     commentText.setOrigin(0.5);
 
     setInterval(() => this.showRandomComment(), 5000);
+    //console.log()
+    // if(this.player.x >= 1000){
+    //   this.scene.start('VictoryScene');
+    // }
   }
 
   update() {
