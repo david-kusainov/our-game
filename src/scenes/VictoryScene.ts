@@ -1,17 +1,20 @@
 import * as Phaser from 'phaser';
 import { UpperWorld } from './UpperWorld';
 
-class VictoryScene extends Phaser.Scene {
+export class VictoryScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'VictoryScene' });
+    super('VictoryScene');
+  }
+
+  preload(){
+    this.load.image('background-sea', './assets/sea1187.png');
   }
 
   create() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Установка изображения в качестве заднего фона
-    const backgroundImage = this.add.image(0, 0, 'background');
+    const backgroundImage = this.add.image(0, 0, 'background-sea');
     backgroundImage.setOrigin(0);
     backgroundImage.setScale(width / backgroundImage.width, height / backgroundImage.height);
 
@@ -32,21 +35,7 @@ class VictoryScene extends Phaser.Scene {
     // Добавление интерактивности к кнопке
     restartButton.setInteractive({ useHandCursor: true });
     restartButton.on('pointerdown', () => {
-      this.scene.start('MainScene');
+      this.scene.start('UpperWorld');
     });
   }
 }
-
-// Инициализация Phaser и создание игры
-const config: Phaser.Types.Core.GameConfig = {
-  // Укажите нужные параметры конфигурации игры
-};
-
-const game = new Phaser.Game(config);
-
-// Добавьте сцену победы (VictoryScene) и основную сцену (MainScene)
-game.scene.add('VictoryScene', VictoryScene);
-game.scene.add('UpperWorld', UpperWorld);
-
-// Загрузка изображения заднего фона
-game.scene.start('VictoryScene', { background: 'assets/background.png' });

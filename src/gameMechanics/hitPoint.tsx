@@ -16,6 +16,7 @@ export class CharacterController {
   }
 
   getHealth(): number {
+    console.log(this.health)
     return this.health;
   }
 

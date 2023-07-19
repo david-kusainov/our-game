@@ -153,13 +153,13 @@ export class DaggerController {
     });
   }
 
-  handleMonsterHit(monster: Phaser.Physics.Arcade.Sprite) {
+  handleMonsterHit(monster: Phaser.Physics.Arcade.Sprite, ) {
     const hitCount = (this.hitCounts.get(monster) || 0) + 1;
     this.hitCounts.set(monster, hitCount);
 
     // console.log(`Количество попаданий: ${hitCount}`);
 
-    if (hitCount >= 100) { // Псевдо жизни монстров
+    if (hitCount >= 300) { // Псевдо жизни монстров
       monster.destroy();
     }
   }

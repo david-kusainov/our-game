@@ -4,6 +4,11 @@ import { DaggerController } from '../gameMechanics/attacksController';
 import { EnemyLogic } from '../gameMechanics/enemyLogic';
 import { CharacterController } from '../gameMechanics/hitPoint';
 
+
+let commentText: Phaser.GameObjects.Text;
+const comments = ['Люблю флексить!', 'Смотри как могу!', 'Вот так вот!', 'Как? Да вот так вот!', 'Играй по аккуратнее!', 'Я как Майкл Джексон!', 'Когда то и меня вела дорога приключений, но потом мне прострелили колено', 'Отступаем!', 'Хожу только задом на перед',
+'Че смотришь?', 'Впереди интересно', 'Ну не очень то и хотелось туда', 'У меня меч летает...'];
+
 export class UpperWorld extends Phaser.Scene {
   private playerController?: PlayerController;
   private daggerController?: DaggerController;
@@ -22,7 +27,7 @@ export class UpperWorld extends Phaser.Scene {
   
 
   constructor() {
-    super('upperworld');
+    super('UpperWorld');
     this.characterController = new CharacterController(this);
   }
 
@@ -50,7 +55,6 @@ export class UpperWorld extends Phaser.Scene {
 
     this.load.image('dagger', './assets/dagger.png');
 
-    // this.load.image('viking', './assets/viking.png');
     this.load.spritesheet('viking', 'assets/viking-sheet.png', {
       frameWidth: 400,
       frameHeight: 300
@@ -73,11 +77,11 @@ export class UpperWorld extends Phaser.Scene {
     this.load.image('bossBullet',  this.bossBulletPath); // Снаряд для босса
   }
 
-  create(input: any) {
+  create() {
   
     // Камера
     const worldWidth = 10400; // Ширина сцены
-    const worldHeight = 600; // Высота сцены
+    const worldHeight = 1000; // Высота сцены
     this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height);
     this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
@@ -93,14 +97,6 @@ export class UpperWorld extends Phaser.Scene {
     this.add.image(7716, 320, 'background-podval');
     this.add.image(8903, 320, 'background-podval');
     this.add.image(10090, 320, 'background-kirpich');
-
-
-
-    // Отображение жизней
-    this.healthText = this.add.text(10, 10, '', { font: '20px', color: 'red' });
-    this.healthText.setScrollFactor(0);
-    this.updateHealthText();
-
 
     // Земля
     this.groundGroup = this.physics.add.staticGroup();
@@ -129,12 +125,13 @@ export class UpperWorld extends Phaser.Scene {
     const block9 = this.groundGroup.create(4520, 300, 'block-blue');
     const block10 = this.groundGroup.create(4670, 200, 'block-blue');
 
-    const block11 = this.groundGroup.create(4820, 200, 'block-kirpich');
-    const block12 = this.groundGroup.create(4970, 300, 'block-kirpich');
-    const block13 = this.groundGroup.create(5120, 400, 'block-kirpich');
-    const block14 = this.groundGroup.create(5270, 500, 'block-kirpich');
+    const block11 = this.groundGroup.create(4750, 0, 'block-kirpich');
+    const block12 = this.groundGroup.create(4750, 80, 'block-kirpich');
+    const block13 = this.groundGroup.create(4750, 80, 'block-kirpich');
+    const block14 = this.groundGroup.create(4750, 80, 'block-kirpich');
+    const block15 = this.groundGroup.create(4750, 80, 'block-kirpich');
 
-    const block15 = this.groundGroup.create(6750, 480, 'block-kirpich');
+    const block119 = this.groundGroup.create(6750, 480, 'block-kirpich');
 
     const block16 = this.groundGroup.create(7000, 530, 'block-kirpich');
     const block17 = this.groundGroup.create(7200, 400, 'block-kirpich');
@@ -142,7 +139,7 @@ export class UpperWorld extends Phaser.Scene {
 
 
     // Персонаж
-    this.player = this.physics.add.sprite(300, 300, 'man');
+    this.player = this.physics.add.sprite(200, 500, 'man');
     this.player.setScale(0.4);
     this.physics.add.collider(this.player, this.groundGroup);
     this.cameras.main.startFollow(this.player);
@@ -159,10 +156,19 @@ export class UpperWorld extends Phaser.Scene {
 
     // Босс
     this.bossGroup = this.physics.add.group();
-    const boss1 = this.bossGroup.create(9000, 300, 'boss')
+    //const boss1 = this.bossGroup.create(9000, 300, 'boss')
+
+    this.anims.create({
+      key: 'boss',
+      frameRate: 2,
+      frames: this.anims.generateFrameNumbers('boss', {start: 0, end:2}),
+      repeat: -1
+    });
+
     this.bossGroup.getChildren().forEach((boss: Phaser.GameObjects.GameObject) => {
       const bossSprite = boss as Phaser.Physics.Arcade.Sprite;
       bossSprite.setScale(0.4); // Размеры
+      bossSprite.play('boss');
     });
 
     this.physics.add.collider(this.bossGroup, this.groundGroup);
@@ -170,47 +176,56 @@ export class UpperWorld extends Phaser.Scene {
 
     // Призрак
     this.ghostGroup = this.physics.add.group();
-    const ghost1 = this.ghostGroup.create(6650, 300, 'ghost');
+    //const ghost1 = this.ghostGroup.create(6650, 300, 'ghost');
+
+    this.anims.create({
+      key: 'ghost',
+      frameRate: 2,
+      frames: this.anims.generateFrameNumbers('ghost', {start: 0, end:2}),
+      repeat: -1
+      });
 
     this.ghostGroup.getChildren().forEach((ghost: Phaser.GameObjects.GameObject) => {
       const ghostSprite = ghost as Phaser.Physics.Arcade.Sprite;
       ghostSprite.setScale(0.5);  // Размеры
+      ghostSprite.play('ghost');
     });
-
-    this.physics.add.collider(this.ghostGroup, this.groundGroup);
 
 
     // Гарпии
     this.harpyGroup = this.physics.add.group();
-    const harpy1 = this.harpyGroup.create(2000, 500, 'harpy');
+    //const harpy1 = this.harpyGroup.create(2000, 500, 'harpy');
+
+    this.anims.create({
+      key: 'harpy',
+      frameRate: 2,
+      frames: this.anims.generateFrameNumbers('harpy', {start: 0, end:2}),
+      repeat: -1
+      });
 
     this.harpyGroup.getChildren().forEach((harpy: Phaser.GameObjects.GameObject) => {
       const harpySprite = harpy as Phaser.Physics.Arcade.Sprite;
       harpySprite.setScale(0.5);  // Размеры
+      harpySprite.play('harpy');
     });
 
     this.physics.add.collider(this.harpyGroup, this.groundGroup);
 
-    // this.anims.create({
-    //   key: 'harpyAnim',
-    //   frameRate: 2,
-    //   frames: this.anims.generateFrameNumbers('harpy', {start: 0, end:2}),
-    //   repeat: -1
-    //   });
-
-      // this.harpyGroup.children.iterate((harpy: Phaser.GameObjects.GameObject) => {
-      //   const harpySprite = harpy as Phaser.GameObjects.Sprite;
-      //   harpySprite.play('harpyAnim');
-      // }); 
-
-
     // Викинги
     this.vikingGroup = this.physics.add.group();
-    const viking1 = this.vikingGroup.create(3650, 300, 'viking');
+    //const viking1 = this.vikingGroup.create(3650, 300, 'viking');
+
+    this.anims.create({
+      key: 'viking',
+      frameRate: 2,
+      frames: this.anims.generateFrameNumbers('viking', {start: 0, end:2}),
+      repeat: -1
+      });
 
     this.vikingGroup.getChildren().forEach((viking: Phaser.GameObjects.GameObject) => {
       const vikingSprite = viking as Phaser.Physics.Arcade.Sprite;
       vikingSprite.setScale(0.6);  // Размеры
+      vikingSprite.play('viking');
     });
   
     this.physics.add.collider(this.vikingGroup, this.groundGroup);
@@ -234,10 +249,16 @@ export class UpperWorld extends Phaser.Scene {
         this.daggerController.throwDagger(pointer);
       }
     });
+
+    // Коментарии персонажа
+    commentText = this.add.text(this.player.x, this.player.y - 30, '', { fontFamily: 'Arial', fontSize: 18, color: '#ffffff' });
+    commentText.setOrigin(0.5);
+
+    setInterval(() => this.showRandomComment(), 5000);
   }
 
   update() {
-    this.updateHealthText();
+    commentText.setPosition(this.player.x, this.player.y - 30);
 
     if (this.playerController) {
       this.playerController.update();
@@ -253,9 +274,17 @@ export class UpperWorld extends Phaser.Scene {
     }
   }
 
- updateHealthText(): void {
-    if (this.healthText) {
-      this.healthText.setText(`Здоровье: ${this.characterController.getHealth()}`);
-    }
+  showRandomComment = () => {
+    const comment = this.getRandomComment();
+    commentText.setText(comment);
+    // commentText.setPosition(this.player.x, this.player.y - 4000);
+  
+    setTimeout(() => {
+      commentText.setText('');
+    }, 3000);
+  }
+  
+  getRandomComment = () => {
+    return comments[Math.floor(Math.random() * comments.length)];
   }
 }

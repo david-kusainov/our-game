@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import { CharacterController } from './hitPoint';
 
-import harpyBullet  from '../../public/assets/dagger.png' 
-
 export class EnemyLogic {
   private ghostGroup?: Phaser.Physics.Arcade.Group;
   private harpyGroup?: Phaser.Physics.Arcade.Group;
@@ -163,7 +161,7 @@ export class EnemyLogic {
 
         vikingSprite.setVelocityX(directionX * 200);
         if (distanceToPlayer < 100) {
-          vikingSprite.setVelocityY(-300);
+          vikingSprite.setVelocityY(-400);
         }
       } else {
         vikingSprite.setVelocity(0);
@@ -214,8 +212,9 @@ export class EnemyLogic {
         if (canFire) {
           const bullet = this.physics.add.sprite(bossSprite.x, bossSprite.y, 'bossBullet');
           bullet.setScale(0.3); // Размер
-          bullet.setVelocityX(directionX * 500); // Скорость по оси X
-
+          bullet.setVelocityX(directionX * 1600); // Скорость по оси X
+          bullet.setGravity(0);
+          
           // Логика прокосновений
           this.physics.add.collider(bullet, this.player, () => {
             const currentTime = this.time.now;
