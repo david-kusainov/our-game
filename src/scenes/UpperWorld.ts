@@ -6,8 +6,11 @@ import { CharacterController } from '../gameMechanics/hitPoint';
 
 
 let commentText: Phaser.GameObjects.Text;
-const comments = ['Люблю флексить!', 'Смотри как могу!', 'Вот так вот!', 'Как? Да вот так вот!', 'Играй по аккуратнее!', 'Я как Майкл Джексон!', 'Когда то и меня вела дорога приключений, но потом мне прострелили колено', 'Отступаем!', 'Хожу только задом на перед',
-'Че смотришь?', 'Впереди интересно', 'Ну не очень то и хотелось туда', 'У меня меч летает...', 'Люблю флексить', 'Я как Майкл Джесон','Ну все базар Джексон'];
+const comments = ['Люблю флексить!', 'Смотри как могу!', 'Вот так вот!', 'Как? Да вот так вот!', 'Играй по аккуратнее!', 'Я как Майкл Джексон!',
+ 'Когда то и меня вела дорога приключений, но потом мне прострелили колено', 
+ 'Отступаем!', 'Хожу только задом на перед', 'Че смотришь?', 'Впереди интересно', 
+ 'Ну не очень то и хотелось туда', 'У меня меч летает...', 'Люблю флексить', 
+ 'Я как Майкл Джесон','Ну все базар Джексон'];
 
 export class UpperWorld extends Phaser.Scene {
   private playerController?: PlayerController;
@@ -24,7 +27,8 @@ export class UpperWorld extends Phaser.Scene {
   private healthText?: Phaser.GameObjects.Text;
   private harpyBulletPath!: string;
   private bossBulletPath!: string;
-  
+  private commentTimer?: Phaser.Time.TimerEvent;
+  private commentText?: Phaser.GameObjects.Text;
 
   constructor() {
     super('UpperWorld');
@@ -159,7 +163,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Босс
     this.bossGroup = this.physics.add.group();
-    const boss1 = this.bossGroup.create(300, 300, 'boss')
+    const boss1 = this.bossGroup.create(7500, 300, 'boss')
 
     this.anims.create({
       key: 'boss',
@@ -172,6 +176,11 @@ export class UpperWorld extends Phaser.Scene {
       const bossSprite = boss as Phaser.Physics.Arcade.Sprite;
       bossSprite.setScale(0.4); // Размеры
       bossSprite.play('boss');
+
+      bossSprite.on('destroy', () => {
+        this.scene.start('VictoryScene');
+        this.destroyCommentTimer();
+      });
     });
 
     this.physics.add.collider(this.bossGroup, this.groundGroup);
@@ -179,7 +188,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Призрак
     this.ghostGroup = this.physics.add.group();
-    //const ghost1 = this.ghostGroup.create(6650, 300, 'ghost');
+    const ghost1 = this.ghostGroup.create(6650, 300, 'ghost');
 
     this.anims.create({
       key: 'ghost',
@@ -198,7 +207,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Гарпии
     this.harpyGroup = this.physics.add.group();
-    //const harpy1 = this.harpyGroup.create(2000, 500, 'harpy');
+    const harpy1 = this.harpyGroup.create(2000, 500, 'harpy');
 
     this.anims.create({
       key: 'harpy',
@@ -217,7 +226,7 @@ export class UpperWorld extends Phaser.Scene {
 
     // Викинги
     this.vikingGroup = this.physics.add.group();
-    //const viking1 = this.vikingGroup.create(3650, 300, 'viking');
+    const viking1 = this.vikingGroup.create(3650, 300, 'viking');
 
     this.anims.create({
       key: 'viking',
@@ -255,14 +264,19 @@ export class UpperWorld extends Phaser.Scene {
     });
 
     // Коментарии персонажа
-    commentText = this.add.text(this.player.x, this.player.y - 30, '', { fontFamily: 'Arial', fontSize: 18, color: '#ffffff' });
+     commentText = this.add.text(this.player.x, this.player.y - 30, '', {
+      fontFamily: 'Arial',
+      fontSize: 18,
+      color: '#ffffff'
+    });
     commentText.setOrigin(0.5);
 
-    setInterval(() => this.showRandomComment(), 5000);
-    //console.log()
-    // if(this.player.x >= 1000){
-    //   this.scene.start('VictoryScene');
-    // }
+    this.commentTimer = this.time.addEvent({
+      delay: 5000,
+      loop: true,
+      callback: this.showRandomComment,
+      callbackScope: this, 
+    });
   }
 
   update() {
@@ -282,17 +296,32 @@ export class UpperWorld extends Phaser.Scene {
     }
   }
 
+  clearComments() {
+    if (commentText) {
+      commentText.destroy();
+    }
+  }
+
   showRandomComment = () => {
-    const comment = this.getRandomComment();
-    commentText.setText(comment);
-    // commentText.setPosition(this.player.x, this.player.y - 4000);
-  
-    setTimeout(() => {
-      commentText.setText('');
-    }, 3000);
+    if (commentText) {
+      const comment = this.getRandomComment();
+      commentText.setText(comment);
+    
+      setTimeout(() => {
+        if (commentText) {
+          commentText.setText('');
+        }
+      }, 3000);
+    }
   }
   
   getRandomComment = () => {
     return comments[Math.floor(Math.random() * comments.length)];
+  }
+
+  destroyCommentTimer() {
+    if (this.commentTimer) {
+      this.commentTimer.remove();
+    }
   }
 }

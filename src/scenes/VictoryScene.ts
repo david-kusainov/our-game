@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { UpperWorld } from './UpperWorld';
+
 
 export class VictoryScene extends Phaser.Scene {
   constructor() {

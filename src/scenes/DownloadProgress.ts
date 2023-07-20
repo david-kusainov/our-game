@@ -23,7 +23,7 @@ export class DownloadProgress extends Phaser.Scene {
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(width / 2 - 160, height / 2 - 30, 320, 50);
 
-    this.time.delayedCall(5000, () => {
+    this.time.delayedCall(1000, () => {
       progressBar.destroy();
       progressBox.destroy();
       loadingText.destroy();

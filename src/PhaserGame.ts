@@ -17,8 +17,7 @@ const upperWorldConfig: Phaser.Types.Core.GameConfig = {
       debug: true,
     },
   },
-   //scene: [HomeScreen, DownloadProgress, UpperWorld, VictoryScene],
-	scene: [UpperWorld],
+   	scene: [HomeScreen, DownloadProgress, UpperWorld, VictoryScene],
 	plugins: {
 		scene: [{ key: 'InputPlugin', plugin: Phaser.Input.InputPlugin, mapping: 'input' }],
 	},
