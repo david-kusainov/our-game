@@ -235,7 +235,7 @@ export class EnemyLogic {
       this.physics.add.collider(bossSprite, this.player, () => {
         const currentTime = this.time.now;
         if (currentTime - this.lastHitTime >= this.hitCooldown) {
-          this.characterController.takeDamage(10); // Единиц урона за касание
+          this.characterController.takeDamage(1000); // Единиц урона за касание
           this.lastHitTime = currentTime;
         }
       });
